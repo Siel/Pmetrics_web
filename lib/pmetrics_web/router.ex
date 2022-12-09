@@ -15,6 +15,7 @@ defmodule PmetricsWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug :fetch_current_api_user
   end
 
   scope "/", PmetricsWeb do
@@ -42,6 +43,21 @@ defmodule PmetricsWeb.Router do
       live_dashboard "/dashboard", metrics: PmetricsWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
+  end
+
+  ## Public JSON API
+
+  scope "/api", PmetricsWeb do
+    pipe_through [:api]
+    post "/users/log_in", UserSessionController, :create_api
+  end
+
+  ## Private JSON API
+
+  scope "/api", PmetricsWeb do
+    pipe_through [:api, :require_authenticated_api_user]
+    get "/users", UserController, :index #TODO: move this to another context
+
   end
 
   ## Authentication routes

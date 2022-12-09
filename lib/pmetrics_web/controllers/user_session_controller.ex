@@ -34,6 +34,20 @@ defmodule PmetricsWeb.UserSessionController do
     end
   end
 
+  def create_api(conn,%{"user" => user_params}) do
+    %{"email" => email, "password" => password} = user_params
+
+    if user = Session.get_user_by_email_and_password(email, password) do
+      token = Session.generate_user_session_token(user)
+      render(conn, :token, %{user: user, token: token})
+    else
+      # In order to prevent user enumeration attacks, don't disclose whether the email is registered.
+      conn
+      |> put_status(401)
+      |> render(:error, message: "Invalid email or password")
+    end
+  end
+
   def delete(conn, _params) do
     conn
     |> put_flash(:info, "Logged out successfully.")

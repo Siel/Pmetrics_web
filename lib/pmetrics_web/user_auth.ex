@@ -94,6 +94,20 @@ defmodule PmetricsWeb.UserAuth do
     assign(conn, :current_user, user)
   end
 
+  def fetch_current_api_user(conn, _opts) do
+    with ["Bearer " <> token] <- get_req_header(conn, "authorization"),
+          {:ok, token} <- Base.url_decode64(token, padding: false),
+         user <- Session.get_user_by_session_token(token) do
+      conn
+      |> assign(:current_user, user)
+    else
+      error ->
+        IO.inspect(error)
+        conn
+    end
+  end
+
+
   defp ensure_user_token(conn) do
     if token = get_session(conn, :user_token) do
       {token, conn}
@@ -214,6 +228,18 @@ defmodule PmetricsWeb.UserAuth do
       |> halt()
     end
   end
+
+  def require_authenticated_api_user(conn, _opts) do
+    if conn.assigns[:current_user] do
+      conn
+    else
+      conn
+      |> put_resp_header("content-type", "application/json; charset=utf-8")
+      |> halt()
+      |> send_resp(401, Jason.encode!(%{message: "Authentication required"}, pretty: true))
+    end
+  end
+
 
   defp put_token_in_session(conn, token) do
     conn
