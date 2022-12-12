@@ -56,6 +56,7 @@ defmodule PmetricsWeb.Router do
 
   scope "/api", PmetricsWeb do
     pipe_through [:api, :require_authenticated_api_user]
+    post "/runs/new", AlquimiaController, :new
     get "/users", UserController, :index #TODO: move this to another context
 
   end
