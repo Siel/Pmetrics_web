@@ -3,6 +3,11 @@ defmodule PmetricsWeb.Router do
 
   import PmetricsWeb.UserAuth
 
+  pipeline :api do
+    plug :accepts, ["json"]
+    plug :fetch_current_api_user
+  end
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -13,10 +18,7 @@ defmodule PmetricsWeb.Router do
     plug :fetch_current_user
   end
 
-  pipeline :api do
-    plug :accepts, ["json"]
-    plug :fetch_current_api_user
-  end
+
 
   scope "/", PmetricsWeb do
     pipe_through :browser
