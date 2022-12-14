@@ -22,4 +22,14 @@ defmodule PmetricsWeb.AlquimiaController do
       |> render("run.json", run: run)
     end
   end
+
+  def get_status(conn, %{"id" => id}) do
+    status = Alquimia.Server.summary(id)
+    render(conn, "status.json", status: status)
+  end
+
+  def get_outdata(conn, %{"id" => id}) do
+    outdata_txt = Alquimia.Server.get_outdata(id)
+    render(conn, "outdata.json", outdata_txt: outdata_txt)
+  end
 end
