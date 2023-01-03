@@ -1,0 +1,26 @@
+<.header>
+  Admin <%= @admin.id %>
+  <:subtitle>This is a admin record from your database.</:subtitle>
+  <:actions>
+    <.link patch={~p"/users/#{@admin}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit admin</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Email"><%= @admin.email %></:item>
+</.list>
+
+<.back navigate={~p"/users"}>Back to users</.back>
+
+<.modal :if={@live_action == :edit} id="admin-modal" show on_cancel={JS.patch(~p"/users/#{@admin}")}>
+  <.live_component
+    module={PmetricsWeb.AdminLive.FormComponent}
+    id={@admin.id}
+    title={@page_title}
+    action={@live_action}
+    admin={@admin}
+    navigate={~p"/users/#{@admin}"}
+  />
+</.modal>

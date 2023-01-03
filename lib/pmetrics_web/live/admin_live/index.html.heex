@@ -1,0 +1,39 @@
+<.header>
+  Listing Users
+  <:actions>
+    <.link patch={~p"/users/new"}>
+      <.button>New Admin</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table id="users" rows={@users} row_click={&JS.navigate(~p"/users/#{&1}")}>
+  <:col :let={admin} label="Email"><%= admin.email %></:col>
+  <:action :let={admin}>
+    <div class="sr-only">
+      <.link navigate={~p"/users/#{admin.id}"}>Show</.link>
+    </div>
+    <.link patch={~p"/users/#{admin.id}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={admin}>
+    <.link phx-click={JS.push("delete", value: %{id: admin.id})} data-confirm="Are you sure?">
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="admin-modal"
+  show
+  on_cancel={JS.navigate(~p"/users")}
+>
+  <.live_component
+    module={PmetricsWeb.AdminLive.FormComponent}
+    id={@admin.id || :new}
+    title={@page_title}
+    action={@live_action}
+    admin={@admin}
+    navigate={~p"/users"}
+  />
+</.modal>

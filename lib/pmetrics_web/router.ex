@@ -77,6 +77,12 @@ defmodule PmetricsWeb.Router do
       live "/users/log_in", UserLoginLive, :new
       live "/users/reset_password", UserForgotPasswordLive, :new
       live "/users/reset_password/:token", UserResetPasswordLive, :edit
+      live "/users", AdminLive.Index, :index
+      live "/users/new", AdminLive.Index, :new
+      live "/users/:id/edit", AdminLive.Index, :edit
+
+      live "/users/:id", AdminLive.Show, :show
+      live "/users/:id/show/edit", AdminLive.Show, :edit
     end
 
     post "/users/log_in", UserSessionController, :create

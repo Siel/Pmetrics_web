@@ -12,10 +12,6 @@ defmodule Pmetrics.Alquimia do
     GenServer.start_link(__MODULE__, :queue.new)
   end
 
-  def register_execution(run_params) do
-    GenServer.call(self(), {:register_execution, run_params})
-  end
-
   def update_queue do
     GenServer.cast(self(), :update_queue)
   end
@@ -24,6 +20,7 @@ defmodule Pmetrics.Alquimia do
   # Callbacks
 
   def init(state) do
+    Process.register(self(), :alquimia)
     {:ok, state}
   end
 
