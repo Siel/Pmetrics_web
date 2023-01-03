@@ -78,7 +78,7 @@ defmodule Pmetrics.Alquimia.Server do
         # TODO: is it ok to call the DB from here?
         Run.update_execution(analysis)
 
-        {:noreply, analysis}
+        {:stop, "Execution finished", analysis}
 
       true ->
         schedule_poll()
@@ -99,7 +99,12 @@ defmodule Pmetrics.Alquimia.Server do
 
   # util
 
-  def terminate(_reason, _game) do
+  def terminate(_reason, _state) do
+    Task.start(fn ->
+        Process.sleep(300)
+        Alquimia.update_queue()
+      end
+    )
     :ok
   end
 

@@ -5,7 +5,6 @@ defmodule Pmetrics.Alquimia do
   alias Pmetrics.Alquimia
 
   @max_concurrent_executions 1
-  @polling_rate
 
   # API
 
@@ -14,7 +13,11 @@ defmodule Pmetrics.Alquimia do
   end
 
   def register_execution(run_params) do
-    GenServer.call(self, {:register_execution, run_params})
+    GenServer.call(self(), {:register_execution, run_params})
+  end
+
+  def update_queue do
+    GenServer.cast(self(), :update_queue)
   end
 
 
@@ -34,14 +37,20 @@ defmodule Pmetrics.Alquimia do
         run.data_txt
       ) do
         queue = :queue.in(analysis, queue)
-                |> check_for_executions()
+                |> update_queue_()
 
         #iniciar una nueva ejecución si es el caso
         {:ok, queue, queue}
       end
   end
 
-  def check_for_executions(queue) do
+  def handle_cast(:update_queue, queue) do
+    {:noreply, update_queue_(queue)}
+  end
+
+  # Util
+
+  defp update_queue_(queue) do
     if Alquimia.ServerSupervisor.active_analysis |> Enum.count < @max_concurrent_executions do
       case :queue.out(queue) do
         {:empty, q} -> q
