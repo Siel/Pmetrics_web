@@ -87,6 +87,13 @@ defmodule Pmetrics.Alquimia.Server do
   end
 
   def handle_info(:timeout, analysis) do
+    #cambiar cast to call en las ejecuciones, verificar el timeout
+    # si llega un timeout cambiar el estado, actualizar la db y apagar el proceso
+    # analysis =
+    #   analysis
+    #   |> Alquimia.Analysis.parse_out_data()
+    #   |> Map.put(:status, "timeout")
+    #Run.update_execution(analysis)
     {:stop, {:shutdown, :timeout}, analysis}
   end
 

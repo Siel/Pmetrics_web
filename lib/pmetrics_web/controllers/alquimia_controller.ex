@@ -9,15 +9,7 @@ defmodule PmetricsWeb.AlquimiaController do
   #need are the data's id and some identifier for the model
 
   def new(conn, %{"run" => run_params}) do
-    with {:ok, run} <-
-           Alquimia.Schemas.Run.create_run(run_params),
-         {:ok, _} <-
-           Alquimia.ServerSupervisor.start_analysis(
-             run.id,
-             run.model_txt,
-             run.data_txt
-           ),
-         _ <- Alquimia.Server.execute(run.id) do
+    with {:ok, run} <- Alquimia.register_execution(run_params) do
       conn
       |> render("run.json", run: run)
     end

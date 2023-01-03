@@ -13,7 +13,7 @@ defmodule Pmetrics.Alquimia.Analysis do
             id: "",
             status: nil
 
-  @pkpdb_url "http://localhost:4000/api/v0/"
+  # @pkpdb_url "http://localhost:4000/api/v0/"
 
   alias __MODULE__
 
@@ -97,10 +97,10 @@ defmodule Pmetrics.Alquimia.Analysis do
   #   %{analysis | model: Alquimia.Model.new(model)}
   # end
 
-  def execute(analysis_list) when is_list(analysis_list) do
-    analysis_list
-    |> Enum.map(&execute/1)
-  end
+  # def execute(analysis_list) when is_list(analysis_list) do
+  #   analysis_list
+  #   |> Enum.map(&execute/1)
+  # end
 
   # def execute(analysis = %Analysis{mode: :automatic}) do
   #   Rservex.eval(analysis.conn, "setwd('" <> analysis.path <> "')")

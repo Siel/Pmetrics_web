@@ -30,7 +30,7 @@ defmodule Pmetrics.Alquimia.ServerSupervisor do
     |> Enum.map(fn {_, analysis_pid, _, _} ->
       Registry.keys(Alquimia.ServerRegistry, analysis_pid) |> List.first()
     end)
-    |> Enum.map(&Alquimia.Server.summary/1)
+    # |> Enum.map(&Alquimia.Server.summary/1)
   end
 
   # Server Callbacks

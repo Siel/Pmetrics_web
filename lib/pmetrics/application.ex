@@ -19,7 +19,8 @@ defmodule Pmetrics.Application do
       # Start the Endpoint (http/https)
       PmetricsWeb.Endpoint,
       {Registry, keys: :unique, name: Pmetrics.Alquimia.ServerRegistry},
-      Pmetrics.Alquimia.ServerSupervisor
+      Pmetrics.Alquimia.ServerSupervisor,
+      Pmetrics.Alquimia
       # Start a worker by calling: Pmetrics.Worker.start_link(arg)
       # {Pmetrics.Worker, arg}
     ]
