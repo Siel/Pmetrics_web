@@ -14,6 +14,7 @@ defmodule Pmetrics.Alquimia.Schemas.Run do
     field :out_path, :string
     field :started_at, :utc_datetime
     field :status, :string
+    field :out_data, :string
 
     timestamps()
   end
@@ -30,7 +31,8 @@ defmodule Pmetrics.Alquimia.Schemas.Run do
       :model_txt,
       :data_txt,
       :started_at,
-      :finished_at
+      :finished_at,
+      :out_data
     ])
     |> validate_required([:status, :model_txt, :data_txt])
   end
@@ -43,6 +45,15 @@ defmodule Pmetrics.Alquimia.Schemas.Run do
     %Run{}
     |> Run.changeset(attrs |> Map.put_new("status", "created"))
     |> Repo.insert()
+  end
+
+  def get_run!(id) do
+    Repo.get!(Run, id)
+  end
+
+  def get_out_data!(id) do
+    get_run!(id)
+    |>Map.get(:out_data)
   end
 
   def update_execution(analysis) do
@@ -62,7 +73,8 @@ defmodule Pmetrics.Alquimia.Schemas.Run do
   defp data_to_update(analysis = %{status: "finished"}) do
     %{
       status: analysis.status,
-      finished_at: DateTime.utc_now()
+      finished_at: DateTime.utc_now(),
+      out_data: analysis.out_data
     }
   end
 end

@@ -6,7 +6,7 @@ defmodule Pmetrics.Alquimia.Server do
   alias Alquimia.Schemas.Run
 
   @timeout :timer.hours(1)
-  @polling_rate 1000
+  @polling_rate 3000
 
   # Server API
 
@@ -22,9 +22,9 @@ defmodule Pmetrics.Alquimia.Server do
     GenServer.call(via_tuple(id), :summary)
   end
 
-  def get_outdata(id) do
-    GenServer.call(via_tuple(id), :outdata)
-  end
+  # def get_outdata(id) do
+  #   GenServer.call(via_tuple(id), :outdata)
+  # end
 
   def execute(id) do
     # GenServer.call(via_tuple(id), :execute)
@@ -41,10 +41,10 @@ defmodule Pmetrics.Alquimia.Server do
     {:reply, analysis, analysis, @timeout}
   end
 
-  def handle_call(:outdata, _from, analysis) do
-    outdata_txt = Alquimia.Analysis.get_outdata(analysis)
-    {:reply, outdata_txt, analysis, @timeout}
-  end
+  # def handle_call(:outdata, _from, analysis) do
+  #   outdata_txt = Alquimia.Analysis.get_outdata(analysis)
+  #   {:reply, outdata_txt, analysis, @timeout}
+  # end
 
   def handle_cast(:execute, analysis) do
     Logger.info("__________EXECUTE__________")
@@ -73,10 +73,10 @@ defmodule Pmetrics.Alquimia.Server do
           analysis
           |> Alquimia.Analysis.parse_out_data()
           |> Map.put(:status, "finished")
+          |> Map.put(:out_data, Alquimia.Analysis.get_outdata(analysis))
 
-        # TODO: is it ok to call the DB from here?
         Run.update_execution(analysis)
-        Process.send_after(Process.whereis(:alquimia), :update_queue, 300)
+        Process.send_after(Alquimia.pid, :update_queue, 300)
         {:stop, {:shutdown, :execution_finished}, analysis}
 
       true ->

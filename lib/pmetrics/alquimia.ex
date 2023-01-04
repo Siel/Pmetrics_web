@@ -5,8 +5,13 @@ defmodule Pmetrics.Alquimia do
   alias Pmetrics.Alquimia
 
   @max_concurrent_executions 1
+  @ref :alquimia
 
   # API
+
+  def pid do
+    Process.whereis(@ref)
+  end
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, :queue.new)
@@ -16,12 +21,20 @@ defmodule Pmetrics.Alquimia do
     GenServer.cast(self(), :update_queue)
   end
 
+  def get_queue do
+    GenServer.call(pid(), :get_queue)
+  end
+
 
   # Callbacks
 
   def init(state) do
-    Process.register(self(), :alquimia)
+    Process.register(self(), @ref)
     {:ok, state}
+  end
+
+  def handle_call(:get_queue, _from, queue) do
+    {:reply, queue, queue}
   end
 
   def handle_call({:register_execution, run_params}, _from, queue) do
@@ -43,8 +56,7 @@ defmodule Pmetrics.Alquimia do
 
   def handle_info(:update_queue, queue) do
     Logger.info("update queue")
-    queue = update_queue_(queue)
-    {:noreply, queue}
+    {:noreply, update_queue_(queue)}
   end
 
   # Util

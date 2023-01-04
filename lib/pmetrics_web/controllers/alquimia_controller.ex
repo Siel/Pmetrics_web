@@ -19,16 +19,16 @@ defmodule PmetricsWeb.AlquimiaController do
 
   def get_status(conn, %{"id" => id}) do
 
-    status = Alquimia.Server.summary(id)
+    status = Alquimia.Schemas.Run.get_run!(id)
     render(conn, "status.json", status: status)
   end
 
   def get_outdata(conn, %{"id" => id}) do
-    outdata_txt = Alquimia.Server.get_outdata(id)
+    outdata_txt = Alquimia.Schemas.Run.get_out_data!(id)
     render(conn, "outdata.json", outdata_txt: outdata_txt)
   end
 
-  def register_execution(run_params) do
-    GenServer.call(Process.whereis(:alquimia), {:register_execution, run_params})
+  defp register_execution(run_params) do
+    GenServer.call(Alquimia.pid, {:register_execution, run_params})
   end
 end
