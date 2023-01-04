@@ -33,12 +33,6 @@ defmodule Pmetrics.Alquimia.ServerSupervisor do
     |> Enum.map(&Alquimia.Server.summary/1)
   end
 
-  def active_analysis do
-    Alquimia.ServerSupervisor.analysis
-    |> Enum.filter(fn analysis -> analysis.status == "running" end)
-    |> Enum.reduce(0, fn ele, acc -> if ele, do: acc+1, else: acc  end)
-  end
-
   # Server Callbacks
   def init(:ok) do
     DynamicSupervisor.init(strategy: :one_for_one)

@@ -11,7 +11,8 @@ defmodule Pmetrics.Alquimia.Analysis do
             out_path: nil,
             mode: :automatic,
             id: "",
-            status: nil
+            status: nil,
+            created_at: nil
 
   # @pkpdb_url "http://localhost:4000/api/v0/"
 
@@ -20,6 +21,7 @@ defmodule Pmetrics.Alquimia.Analysis do
   @doc """
   harcoded execution
   """
+
   # def new(data_id) do
   #   with model <- Alquimia.Model.new([{"Ka", "0", "5"}, {"V", "0", "10"}]),
   #        {:ok, data} <- fetch_data(data_id),
@@ -45,7 +47,8 @@ defmodule Pmetrics.Alquimia.Analysis do
         conn: conn,
         mode: :manual,
         id: id,
-        status: :created
+        status: :created,
+        created_at: DateTime.utc_now()
       }
     else
       error ->
@@ -121,7 +124,7 @@ defmodule Pmetrics.Alquimia.Analysis do
     File.write!(analysis.path <> "/model.txt", analysis.model_txt)
     # hacky
     {:ok, {:xt_arr_str, out_path}} = Rservex.eval(analysis.conn, "NPrun(alq = T)")
-    %{analysis | status: :running, out_path: out_path}
+    %{analysis | out_path: out_path}
   end
 
   def parse_out_data(analysis = %Analysis{}) do
@@ -164,7 +167,11 @@ defmodule Pmetrics.Alquimia.Analysis do
   defp create_out_file(analysis = %Analysis{}) do
     Logger.info("Creating OUT data")
     # Executing w/out the second patameter means that is going to generate the out file por NPAG
-    Rservex.eval(analysis.conn, "Pmetrics:::makeRdata('" <> analysis.out_path <> "', remote = T, reportType=1)")
+    Rservex.eval(
+      analysis.conn,
+      "Pmetrics:::makeRdata('" <> analysis.out_path <> "', remote = T, reportType=1)"
+    )
+
     Rservex.close(analysis.conn)
   end
 

@@ -14,7 +14,7 @@ defmodule Pmetrics.Alquimia do
   end
 
   def start_link(_) do
-    GenServer.start_link(__MODULE__, :queue.new)
+    GenServer.start_link(__MODULE__, [])
   end
 
   def update_queue do
@@ -25,7 +25,6 @@ defmodule Pmetrics.Alquimia do
     GenServer.call(pid(), :get_queue)
   end
 
-
   # Callbacks
 
   def init(state) do
@@ -34,24 +33,22 @@ defmodule Pmetrics.Alquimia do
   end
 
   def handle_call(:get_queue, _from, queue) do
+    queue = update_queue_(queue)
     {:reply, queue, queue}
   end
 
   def handle_call({:register_execution, run_params}, _from, queue) do
     with {:ok, run} <-
-      Alquimia.Schemas.Run.create_run(run_params),
-    {:ok, _pid} <-
-      Alquimia.ServerSupervisor.start_analysis(
-        run.id,
-        run.model_txt,
-        run.data_txt
-      ) do
-        queue = :queue.in(run, queue)
-        queue = queue |> update_queue_()
+           Alquimia.Schemas.Run.create_run(run_params),
+         {:ok, _pid} <-
+           Alquimia.ServerSupervisor.start_analysis(
+             run.id,
+             run.model_txt,
+             run.data_txt
+           ) do
 
-        #iniciar una nueva ejecución si es el caso
-        {:reply, {:ok, run}, queue}
-      end
+      {:reply, {:ok, run}, update_queue_(queue)}
+    end
   end
 
   def handle_info(:update_queue, queue) do
@@ -61,19 +58,36 @@ defmodule Pmetrics.Alquimia do
 
   # Util
 
-  defp update_queue_(queue) do
-    if Alquimia.ServerSupervisor.active_analysis() < @max_concurrent_executions do
-      case :queue.out(queue) do
-        {:empty, q} -> q
-        {{:value, run}, q} ->
+  defp update_queue_(_queue) do
+    queue = queued_analysis()
+
+    if n_active_analysis() < @max_concurrent_executions do
+      case queue do
+        [run | q] ->
           Alquimia.Server.execute(run.id)
           q
+
+        [] ->
+          []
       end
     else
       queue
     end
   end
 
+  def active_analysis do
+    Alquimia.ServerSupervisor.analysis()
+    |> Enum.filter(fn analysis -> analysis.status == "running" end)
+  end
 
+  def queued_analysis do
+    Alquimia.ServerSupervisor.analysis()
+    |> Enum.filter(fn analysis -> analysis.status == :created end)
+    |> Enum.sort(&(&1.created_at > &2.created_at))
+  end
 
+  def n_active_analysis do
+    active_analysis()
+    |> Enum.reduce(0, fn ele, acc -> if ele, do: acc + 1, else: acc end)
+  end
 end

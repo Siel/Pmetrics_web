@@ -1,7 +1,7 @@
 defmodule Pmetrics.Repo.Migrations.CreateRuns do
   use Ecto.Migration
 
-  #TODO: add user
+  # TODO: add user
 
   def change do
     create table(:runs, primary_key: false) do

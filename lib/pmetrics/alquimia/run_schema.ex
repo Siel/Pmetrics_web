@@ -53,7 +53,7 @@ defmodule Pmetrics.Alquimia.Schemas.Run do
 
   def get_out_data!(id) do
     get_run!(id)
-    |>Map.get(:out_data)
+    |> Map.get(:out_data)
   end
 
   def update_execution(analysis) do

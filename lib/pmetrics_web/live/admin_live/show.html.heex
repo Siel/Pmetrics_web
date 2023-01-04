@@ -14,7 +14,12 @@
 
 <.back navigate={~p"/users"}>Back to users</.back>
 
-<.modal :if={@live_action == :edit} id="admin-modal" show on_cancel={JS.patch(~p"/users/#{@admin}")}>
+<.modal
+  :if={@live_action == :edit}
+  id="admin-modal"
+  show
+  on_cancel={JS.patch(~p"/users/#{@admin}")}
+>
   <.live_component
     module={PmetricsWeb.AdminLive.FormComponent}
     id={@admin.id}

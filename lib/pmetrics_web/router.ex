@@ -18,11 +18,8 @@ defmodule PmetricsWeb.Router do
     plug :fetch_current_user
   end
 
-
-
   scope "/", PmetricsWeb do
     pipe_through :browser
-
   end
 
   # Other scopes may use custom stacks.
@@ -61,8 +58,8 @@ defmodule PmetricsWeb.Router do
     post "/runs/new", AlquimiaController, :new
     get "/runs/:id/status", AlquimiaController, :get_status
     get "/runs/:id/outdata", AlquimiaController, :get_outdata
-    get "/users", UserController, :index #TODO: move this to another context
-
+    # TODO: move this to another context
+    get "/users", UserController, :index
   end
 
   ## Authentication routes

@@ -22,12 +22,7 @@ defmodule Pmetrics.Alquimia.Server do
     GenServer.call(via_tuple(id), :summary)
   end
 
-  # def get_outdata(id) do
-  #   GenServer.call(via_tuple(id), :outdata)
-  # end
-
   def execute(id) do
-    # GenServer.call(via_tuple(id), :execute)
     GenServer.cast(via_tuple(id), :execute)
   end
 
@@ -41,11 +36,6 @@ defmodule Pmetrics.Alquimia.Server do
     {:reply, analysis, analysis, @timeout}
   end
 
-  # def handle_call(:outdata, _from, analysis) do
-  #   outdata_txt = Alquimia.Analysis.get_outdata(analysis)
-  #   {:reply, outdata_txt, analysis, @timeout}
-  # end
-
   def handle_cast(:execute, analysis) do
     Logger.info("__________EXECUTE__________")
 
@@ -53,7 +43,6 @@ defmodule Pmetrics.Alquimia.Server do
       analysis
       |> Alquimia.Analysis.execute()
       |> Map.put(:status, "running")
-
 
     Run.update_execution(analysis)
 
@@ -68,7 +57,6 @@ defmodule Pmetrics.Alquimia.Server do
       File.exists?(analysis.out_path <> "/alquimiaData.json") ->
         Logger.info("Execution " <> analysis.id <> " ended")
 
-        # TODO: Should I start another process to parse the data?
         analysis =
           analysis
           |> Alquimia.Analysis.parse_out_data()
@@ -76,7 +64,7 @@ defmodule Pmetrics.Alquimia.Server do
           |> Map.put(:out_data, Alquimia.Analysis.get_outdata(analysis))
 
         Run.update_execution(analysis)
-        Process.send_after(Alquimia.pid, :update_queue, 300)
+        Process.send_after(Alquimia.pid(), :update_queue, 300)
         {:stop, {:shutdown, :execution_finished}, analysis}
 
       true ->
@@ -86,13 +74,13 @@ defmodule Pmetrics.Alquimia.Server do
   end
 
   def handle_info(:timeout, analysis) do
-    #cambiar cast to call en las ejecuciones, verificar el timeout
+    # cambiar cast to call en las ejecuciones, verificar el timeout
     # si llega un timeout cambiar el estado, actualizar la db y apagar el proceso
     # analysis =
     #   analysis
     #   |> Alquimia.Analysis.parse_out_data()
     #   |> Map.put(:status, "timeout")
-    #Run.update_execution(analysis)
+    # Run.update_execution(analysis)
     {:stop, {:shutdown, :timeout}, analysis}
   end
 

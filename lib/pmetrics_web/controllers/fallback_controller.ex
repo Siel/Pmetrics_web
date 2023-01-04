@@ -21,5 +21,4 @@ defmodule PmetricsWeb.FallbackController do
     |> put_view(html: PmetricsWeb.ErrorHTML, json: PmetricsWeb.ErrorJSON)
     |> render(:"404")
   end
-
 end

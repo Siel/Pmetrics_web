@@ -1,5 +1,4 @@
 defmodule PmetricsWeb.AlquimiaJSON do
-
   def run(%{run: run}) do
     run
   end
