@@ -133,7 +133,6 @@ defmodule Pmetrics.Alquimia.Analysis do
            |> String.trim_trailing()
            |> Jason.decode() do
         {:ok, [data]} ->
-          IO.inspect(data)
           data
 
         {:error, error} ->

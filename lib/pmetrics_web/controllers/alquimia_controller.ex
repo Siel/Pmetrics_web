@@ -18,6 +18,7 @@ defmodule PmetricsWeb.AlquimiaController do
   end
 
   def get_status(conn, %{"id" => id}) do
+
     status = Alquimia.Server.summary(id)
     render(conn, "status.json", status: status)
   end

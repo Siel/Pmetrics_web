@@ -25,12 +25,18 @@ defmodule Pmetrics.Alquimia.ServerSupervisor do
     DynamicSupervisor.terminate_child(__MODULE__, child_pid)
   end
 
-  def active_analysis do
+  def analysis do
     DynamicSupervisor.which_children(__MODULE__)
     |> Enum.map(fn {_, analysis_pid, _, _} ->
       Registry.keys(Alquimia.ServerRegistry, analysis_pid) |> List.first()
     end)
-    # |> Enum.map(&Alquimia.Server.summary/1)
+    |> Enum.map(&Alquimia.Server.summary/1)
+  end
+
+  def active_analysis do
+    Alquimia.ServerSupervisor.analysis
+    |> Enum.filter(fn analysis -> analysis.status == "running" end)
+    |> Enum.reduce(0, fn ele, acc -> if ele, do: acc+1, else: acc  end)
   end
 
   # Server Callbacks

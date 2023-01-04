@@ -27,35 +27,41 @@ defmodule Pmetrics.Alquimia do
   def handle_call({:register_execution, run_params}, _from, queue) do
     with {:ok, run} <-
       Alquimia.Schemas.Run.create_run(run_params),
-    {:ok, analysis} <-
+    {:ok, _pid} <-
       Alquimia.ServerSupervisor.start_analysis(
         run.id,
         run.model_txt,
         run.data_txt
       ) do
-        queue = :queue.in(analysis, queue)
-                |> update_queue_()
+        queue = :queue.in(run, queue)
+        queue = queue |> update_queue_()
 
         #iniciar una nueva ejecución si es el caso
-        {:ok, queue, queue}
+        {:reply, {:ok, run}, queue}
       end
   end
 
-  def handle_cast(:update_queue, queue) do
-    {:noreply, update_queue_(queue)}
+  def handle_info(:update_queue, queue) do
+    Logger.info("update queue")
+    queue = update_queue_(queue)
+    {:noreply, queue}
   end
 
   # Util
 
   defp update_queue_(queue) do
-    if Alquimia.ServerSupervisor.active_analysis |> Enum.count < @max_concurrent_executions do
+    if Alquimia.ServerSupervisor.active_analysis() < @max_concurrent_executions do
       case :queue.out(queue) do
         {:empty, q} -> q
-        {{:value, analysis}, q} ->
-          Alquimia.Server.execute(analysis.id)
+        {{:value, run}, q} ->
+          Alquimia.Server.execute(run.id)
           q
       end
+    else
+      queue
     end
   end
+
+
 
 end

@@ -54,7 +54,6 @@ defmodule Pmetrics.Alquimia.Server do
       |> Alquimia.Analysis.execute()
       |> Map.put(:status, "running")
 
-    IO.inspect(analysis)
 
     Run.update_execution(analysis)
 
@@ -77,8 +76,8 @@ defmodule Pmetrics.Alquimia.Server do
 
         # TODO: is it ok to call the DB from here?
         Run.update_execution(analysis)
-
-        {:stop, "Execution finished", analysis}
+        Process.send_after(Process.whereis(:alquimia), :update_queue, 300)
+        {:stop, {:shutdown, :execution_finished}, analysis}
 
       true ->
         schedule_poll()
@@ -100,11 +99,6 @@ defmodule Pmetrics.Alquimia.Server do
   # util
 
   def terminate(_reason, _state) do
-    Task.start(fn ->
-        Process.sleep(300)
-        Alquimia.update_queue()
-      end
-    )
     :ok
   end
 

@@ -49,7 +49,6 @@ defmodule Pmetrics.Alquimia.Schemas.Run do
     Repo.get!(Run, analysis.id)
     |> Run.changeset(data_to_update(analysis))
     |> Repo.update()
-    |> IO.inspect()
   end
 
   defp data_to_update(analysis = %{status: "running"}) do
