@@ -3,6 +3,11 @@ defmodule PmetricsWeb.Router do
 
   import PmetricsWeb.UserAuth
 
+  pipeline :api do
+    plug :accepts, ["json"]
+    plug :fetch_current_api_user
+  end
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -13,14 +18,8 @@ defmodule PmetricsWeb.Router do
     plug :fetch_current_user
   end
 
-  pipeline :api do
-    plug :accepts, ["json"]
-    plug :fetch_current_api_user
-  end
-
   scope "/", PmetricsWeb do
     pipe_through :browser
-
   end
 
   # Other scopes may use custom stacks.
@@ -56,8 +55,11 @@ defmodule PmetricsWeb.Router do
 
   scope "/api", PmetricsWeb do
     pipe_through [:api, :require_authenticated_api_user]
-    get "/users", UserController, :index #TODO: move this to another context
-
+    post "/runs/new", AlquimiaController, :new
+    get "/runs/:id/status", AlquimiaController, :get_status
+    get "/runs/:id/outdata", AlquimiaController, :get_outdata
+    # TODO: move this to another context
+    get "/users", UserController, :index
   end
 
   ## Authentication routes
@@ -84,6 +86,12 @@ defmodule PmetricsWeb.Router do
       on_mount: [{PmetricsWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+
+      live "/alquimia", AlquimiaLive.Index, :index
+      live "/alquimia/new", AlquimiaLive.Index, :new
+      # live "/alquimia/:id/edit", AlquimiaLive.Index, :edit
+      live "/alquimia/:id", AlquimiaLive.Show, :show
+      live "/alquimia/:id/show/edit", AlquimiaLive.Show, :edit
     end
   end
 

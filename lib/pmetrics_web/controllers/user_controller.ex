@@ -6,7 +6,7 @@ defmodule PmetricsWeb.UserController do
 
   action_fallback PmetricsWeb.FallbackController
 
-  #TODO: move this function out of this context
+  # TODO: move this function out of this context
   def index(conn, _params) do
     users = Session.list_users()
     render(conn, :index, users: users)

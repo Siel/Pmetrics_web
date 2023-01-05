@@ -21,5 +21,4 @@ defmodule PmetricsWeb.UserSessionJSON do
   def error(%{message: message}) do
     %{error: %{message: message}}
   end
-
 end

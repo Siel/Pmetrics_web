@@ -1,0 +1,45 @@
+<.header>
+  Listing Executions
+  <:actions>
+    <.link patch={~p"/alquimia/new"}>
+      <.button>New Execution</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table id="executions" rows={@executions} row_click={&JS.navigate(~p"/alquimia/#{&1}")}>
+  <:col :let={exe} label="Status"><%= exe.status %></:col>
+  <:col :let={exe} label="Created At"><%= exe.inserted_at %></:col>
+  <:col :let={_exe} label="Started By">Julián D. Otálvaro</:col>
+  <:action :let={exe}>
+    <div class="sr-only">
+      <.link navigate={~p"/alquimia/#{exe.id}"}>Show</.link>
+    </div>
+  </:action>
+
+  <:action :let={exe}>
+    <%= if exe.status == "finished" do %>
+      <.link navigate={~p"/alquimia/#{exe.id}"}>View Report</.link>
+    <% else %>
+      <.link phx-click={JS.push("stop", value: %{id: exe.id})} data-confirm="Are you sure?">
+        Stop
+      </.link>
+    <% end %>
+  </:action>
+</.table>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="run-modal"
+  show
+  on_cancel={JS.navigate(~p"/alquimia")}
+>
+  <.live_component
+    module={PmetricsWeb.AlquimiaLive.FormComponent}
+    id={@run.id || :new}
+    title={@page_title}
+    action={@live_action}
+    run={@run}
+    navigate={~p"/alquimia"}
+  />
+</.modal>

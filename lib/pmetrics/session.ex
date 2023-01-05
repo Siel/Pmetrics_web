@@ -360,7 +360,7 @@ defmodule Pmetrics.Session do
       [%User{}, ...]
 
   """
-  #TODO: move this function out of this context
+  # TODO: move this function out of this context
   def list_users do
     Repo.all(User)
   end
@@ -378,10 +378,10 @@ defmodule Pmetrics.Session do
   #     iex> get_user!(456)
   #     ** (Ecto.NoResultsError)
 
-  # """
+  # \"""
   # def get_user!(id), do: Repo.get!(User, id)
 
-  # @doc """
+  # @doc \"""
   # Creates a user.
 
   # ## Examples
@@ -392,14 +392,14 @@ defmodule Pmetrics.Session do
   #     iex> create_user(%{field: bad_value})
   #     {:error, %Ecto.Changeset{}}
 
-  # """
+  # \"""
   # def create_user(attrs \\ %{}) do
   #   %User{}
   #   |> User.changeset(attrs)
   #   |> Repo.insert()
   # end
 
-  # @doc """
+  # @doc \"""
   # Updates a user.
 
   # ## Examples
@@ -410,14 +410,14 @@ defmodule Pmetrics.Session do
   #     iex> update_user(user, %{field: bad_value})
   #     {:error, %Ecto.Changeset{}}
 
-  # """
+  # \"""
   # def update_user(%User{} = user, attrs) do
   #   user
   #   |> User.changeset(attrs)
   #   |> Repo.update()
   # end
 
-  @doc """
+  @doc \"""
   Deletes a user.
 
   ## Examples
