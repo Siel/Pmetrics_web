@@ -41,6 +41,10 @@ defmodule Pmetrics.Alquimia.Schemas.Run do
   alias Pmetrics.Repo
   alias Pmetrics.Alquimia.Schemas.Run
 
+  def change_run(%Run{} = run, attrs \\ %{}) do
+    Run.changeset(run, attrs)
+  end
+
   def create_run(attrs \\ %{}) do
     %Run{}
     |> Run.changeset(attrs |> Map.put_new("status", "created"))
@@ -62,7 +66,7 @@ defmodule Pmetrics.Alquimia.Schemas.Run do
   def paginate(query, page, size) do
     from query,
       limit: ^size,
-      offset: ^((page-1) * size)
+      offset: ^((page - 1) * size)
   end
 
   def get_out_data!(id) do

@@ -28,6 +28,4 @@ defmodule Pmetrics.SessionFixtures do
     [_, token | _] = String.split(captured_email.text_body, "[TOKEN]")
     token
   end
-
-
 end

@@ -1,7 +1,7 @@
 defmodule PmetricsWeb.AlquimiaLive.FormComponent do
   use PmetricsWeb, :live_component
 
-  alias Pmetrics.Accounts
+  alias Pmetrics.Alquimia
 
   @impl true
   def render(assigns) do
@@ -9,20 +9,22 @@ defmodule PmetricsWeb.AlquimiaLive.FormComponent do
     <div>
       <.header>
         <%= @title %>
-        <:subtitle>Use this form to manage admin records in your database.</:subtitle>
+        <:subtitle>Please upload your model and data files.</:subtitle>
       </.header>
 
       <.simple_form
-        :let={f}
         for={@changeset}
-        id="admin-form"
+        id="run-form"
         phx-target={@myself}
         phx-change="validate"
         phx-submit="save"
       >
-        <.input field={{f, :email}} type="text" label="email" />
+        <.label>Model</.label>
+        <.live_file_input upload={@uploads.model} />
+        <.label>Data</.label>
+        <.live_file_input upload={@uploads.data} />
         <:actions>
-          <.button phx-disable-with="Saving...">Save Admin</.button>
+          <.button phx-disable-with="Saving...">Queue Execution</.button>
         </:actions>
       </.simple_form>
     </div>
@@ -30,52 +32,45 @@ defmodule PmetricsWeb.AlquimiaLive.FormComponent do
   end
 
   @impl true
-  def update(%{admin: admin} = assigns, socket) do
-    changeset = Accounts.change_admin(admin)
+  def update(%{run: run} = assigns, socket) do
+    changeset = Alquimia.Schemas.Run.change_run(run)
 
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:changeset, changeset)}
+     |> assign(:changeset, changeset)
+     |> assign(:uploaded_files, [])
+     |> allow_upload(:model, accept: ~w(.txt), max_entries: 1)
+     |> allow_upload(:data, accept: ~w(.csv), max_entries: 1)}
   end
 
+  # @impl true
+  # def handle_event("validate", %{"run" => run_params}, socket) do
+  #   changeset =
+  #     socket.assigns.run
+  #     |> Alquimia.Schemas.Run.change_run(run_params)
+  #     |> Map.put(:action, :validate)
+
+  #   {:noreply, assign(socket, :changeset, changeset)}
+  # end
   @impl true
-  def handle_event("validate", %{"admin" => admin_params}, socket) do
-    changeset =
-      socket.assigns.admin
-      |> Accounts.change_admin(admin_params)
-      |> Map.put(:action, :validate)
-
-    {:noreply, assign(socket, :changeset, changeset)}
+  def handle_event("validate", _params, socket) do
+    {:noreply, socket}
   end
 
-  def handle_event("save", %{"admin" => admin_params}, socket) do
-    save_admin(socket, socket.assigns.action, admin_params)
-  end
+  def handle_event("save", _params, socket) do
 
-  defp save_admin(socket, :edit, admin_params) do
-    case Accounts.update_admin(socket.assigns.admin, admin_params) do
-      {:ok, _admin} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Admin updated successfully")
-         |> push_navigate(to: socket.assigns.navigate)}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, :changeset, changeset)}
-    end
-  end
-
-  defp save_admin(socket, :new, admin_params) do
-    case Accounts.create_admin(admin_params) do
-      {:ok, _admin} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Admin created successfully")
-         |> push_navigate(to: socket.assigns.navigate)}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, changeset: changeset)}
-    end
+    [model_txt]=consume_uploaded_entries(socket, :model, fn %{path: path}, _entry ->
+      File.read(path)
+    end)
+    [data_txt]=consume_uploaded_entries(socket, :data, fn %{path: path}, _entry ->
+      File.read(path)
+    end)
+    run_params = %{"model_txt" => model_txt, "data_txt" => data_txt} |> IO.inspect
+    GenServer.call(Alquimia.pid(), {:register_execution, run_params})
+    {:noreply,
+     socket
+     |> put_flash(:info, "Execution queued successfully")
+     |> push_navigate(to: socket.assigns.navigate)}
   end
 end

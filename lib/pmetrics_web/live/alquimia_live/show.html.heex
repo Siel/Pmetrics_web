@@ -1,31 +1,33 @@
 <.header>
-  Admin <%= @admin.id %>
-  <:subtitle>This is a admin record from your database.</:subtitle>
+  Run <%= @run.id %>
+  <:subtitle>The current status of this run is <b><%= @run.status %></b></:subtitle>
   <:actions>
-    <.link patch={~p"/alquimia/#{@admin}/show/edit"} phx-click={JS.push_focus()}>
-      <.button>Edit admin</.button>
+    <.link patch={~p"/alquimia/#{@run}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Download rdata</.button>
     </.link>
   </:actions>
 </.header>
 
 <.list>
-  <:item title="Email"><%= @admin.email %></:item>
+  <:item title="ID"><%= @run.id %></:item>
+  <:item title="Created at"><%= @run.inserted_at %></:item>
+  <:item title="Owner">Julián D. Otálvaro.</:item>
 </.list>
 
 <.back navigate={~p"/alquimia"}>Back to alquimia</.back>
 
 <.modal
   :if={@live_action == :edit}
-  id="admin-modal"
+  id="run-modal"
   show
-  on_cancel={JS.patch(~p"/alquimia/#{@admin}")}
+  on_cancel={JS.patch(~p"/alquimia/#{@run}")}
 >
   <.live_component
     module={PmetricsWeb.AlquimiaLive.FormComponent}
-    id={@admin.id}
+    id={@run.id}
     title={@page_title}
     action={@live_action}
-    admin={@admin}
-    navigate={~p"/alquimia/#{@admin}"}
+    run={@run}
+    navigate={~p"/alquimia/#{@run}"}
   />
 </.modal>

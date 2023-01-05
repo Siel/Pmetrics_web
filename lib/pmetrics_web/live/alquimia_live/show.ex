@@ -1,7 +1,7 @@
 defmodule PmetricsWeb.AlquimiaLive.Show do
   use PmetricsWeb, :live_view
 
-  alias Pmetrics.Accounts
+  alias Pmetrics.Alquimia.Schemas.Run
 
   @impl true
   def mount(_params, _session, socket) do
@@ -13,9 +13,9 @@ defmodule PmetricsWeb.AlquimiaLive.Show do
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:admin, Accounts.get_admin!(id))}
+     |> assign(:run, Run.get_run!(id))}
   end
 
-  defp page_title(:show), do: "Show Admin"
-  defp page_title(:edit), do: "Edit Admin"
+  defp page_title(:show), do: "Show Run"
+  defp page_title(:edit), do: "Edit Run"
 end

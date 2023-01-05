@@ -2,10 +2,8 @@ defmodule PmetricsWeb.AlquimiaLive.Index do
   use PmetricsWeb, :live_view
   require Logger
 
-  alias Pmetrics.Accounts
-  alias Pmetrics.Accounts.Admin
-
   alias Pmetrics.Alquimia
+  alias Pmetrics.Alquimia.Schemas.Run
 
   @topic "Alquimia"
 
@@ -23,7 +21,7 @@ defmodule PmetricsWeb.AlquimiaLive.Index do
   @impl true
   def handle_info(%{topic: @topic, event: "new_execution", payload: run}, socket) do
     Logger.info("Alquimia Broadcast received")
-    {:noreply, assign(socket, :executions, [run|socket.assigns.executions])}
+    {:noreply, assign(socket, :executions, [run | socket.assigns.executions])}
   end
 
   def handle_info(%{topic: @topic, event: "update_queue", payload: _}, socket) do
@@ -31,16 +29,16 @@ defmodule PmetricsWeb.AlquimiaLive.Index do
     {:noreply, assign(socket, :executions, list_executions())}
   end
 
-  defp apply_action(socket, :edit, %{"id" => id}) do
-    socket
-    |> assign(:page_title, "Edit Admin")
-    |> assign(:admin, Accounts.get_admin!(id))
-  end
+  # defp apply_action(socket, :edit, %{"id" => id}) do
+  #   socket
+  #   |> assign(:page_title, "Edit Admin")
+  #   |> assign(:admin, Accounts.get_admin!(id))
+  # end
 
   defp apply_action(socket, :new, _params) do
     socket
-    |> assign(:page_title, "New Admin")
-    |> assign(:admin, %Admin{})
+    |> assign(:page_title, "New Execution")
+    |> assign(:run, %Run{})
   end
 
   defp apply_action(socket, :index, _params) do
@@ -50,10 +48,8 @@ defmodule PmetricsWeb.AlquimiaLive.Index do
   end
 
   @impl true
-  def handle_event("delete", %{"id" => id}, socket) do
-    admin = Accounts.get_admin!(id)
-    {:ok, _} = Accounts.delete_admin(admin)
-
+  def handle_event("stop", %{"id" => id}, socket) do
+    Alquimia.ServerSupervisor.stop_analysis(id)
     {:noreply, assign(socket, :users, list_executions())}
   end
 

@@ -47,8 +47,7 @@ defmodule Pmetrics.Alquimia.Server do
       |> Map.put(:status, "running")
 
     Run.update_execution(analysis)
-    PmetricsWeb.Endpoint.broadcast_from(self(),@topic,"update_queue",[])
-
+    PmetricsWeb.Endpoint.broadcast_from(self(), @topic, "update_queue", [])
 
     schedule_poll()
     {:noreply, analysis, @timeout}
@@ -68,7 +67,7 @@ defmodule Pmetrics.Alquimia.Server do
           |> Map.put(:out_data, Alquimia.Analysis.get_outdata(analysis))
 
         Run.update_execution(analysis)
-        PmetricsWeb.Endpoint.broadcast_from(self(),@topic,"update_queue",[])
+        PmetricsWeb.Endpoint.broadcast_from(self(), @topic, "update_queue", [])
 
         # :ok = GenServer.call(Alquimia.pid(), {:execute_queue_after, 300})
         # Process.send_after(Alquimia.pid(), :execute_queue, 300)

@@ -21,7 +21,7 @@ defmodule Pmetrics.Alquimia do
 
   def poll_queue do
     # if queued_analysis() |> Enum.count() > 0 do
-      Process.send_after(pid(), :poll_queue, @poll_queue_rate)
+    Process.send_after(pid(), :poll_queue, @poll_queue_rate)
     # end
   end
 
@@ -51,20 +51,20 @@ defmodule Pmetrics.Alquimia do
              run.model_txt,
              run.data_txt
            ) do
-            PmetricsWeb.Endpoint.broadcast_from(self(),@topic,"new_execution",run)
-      {:reply, {:ok, run}, queued_analysis()|>execute()}
+      PmetricsWeb.Endpoint.broadcast_from(self(), @topic, "new_execution", run)
+      {:reply, {:ok, run}, queued_analysis() |> execute()}
     end
   end
 
   def handle_info(:execute_queue, _queue) do
     Logger.info("Fetching queue")
-    {:noreply, queued_analysis()|>execute()}
+    {:noreply, queued_analysis() |> execute()}
   end
 
   def handle_info(:poll_queue, _queue) do
     # Logger.info("Polling queue")
     poll_queue()
-    {:noreply, queued_analysis()|>execute()}
+    {:noreply, queued_analysis() |> execute()}
   end
 
   def handle_call({:execute_queue_after, delay}, queue) do
@@ -97,7 +97,7 @@ defmodule Pmetrics.Alquimia do
   def queued_analysis do
     Alquimia.ServerSupervisor.analysis()
     |> Enum.filter(fn analysis -> analysis.status == :created end)
-    |> Enum.sort(&DateTime.compare(&1.created_at,&2.created_at)==:lt)
+    |> Enum.sort(&(DateTime.compare(&1.created_at, &2.created_at) == :lt))
   end
 
   def n_active_analysis do

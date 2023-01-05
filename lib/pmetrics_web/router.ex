@@ -89,7 +89,7 @@ defmodule PmetricsWeb.Router do
 
       live "/alquimia", AlquimiaLive.Index, :index
       live "/alquimia/new", AlquimiaLive.Index, :new
-      live "/alquimia/:id/edit", AlquimiaLive.Index, :edit
+      # live "/alquimia/:id/edit", AlquimiaLive.Index, :edit
       live "/alquimia/:id", AlquimiaLive.Show, :show
       live "/alquimia/:id/show/edit", AlquimiaLive.Show, :edit
     end
