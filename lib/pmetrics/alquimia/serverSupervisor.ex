@@ -7,7 +7,7 @@ defmodule Pmetrics.Alquimia.ServerSupervisor do
     DynamicSupervisor.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
-  def start_analysis(id, model_txt, data_txt) do
+  def create_analysis(id, model_txt, data_txt) do
     child_spec = %{
       id: Alquimia.Server,
       start: {Alquimia.Server, :start_link, [id, model_txt, data_txt]},

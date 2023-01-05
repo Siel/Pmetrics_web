@@ -51,6 +51,20 @@ defmodule Pmetrics.Alquimia.Schemas.Run do
     Repo.get!(Run, id)
   end
 
+  def all do
+    from(
+      r in Run,
+      order_by: [desc: r.inserted_at]
+    )
+    |> Repo.all()
+  end
+
+  def paginate(query, page, size) do
+    from query,
+      limit: ^size,
+      offset: ^((page-1) * size)
+  end
+
   def get_out_data!(id) do
     get_run!(id)
     |> Map.get(:out_data)

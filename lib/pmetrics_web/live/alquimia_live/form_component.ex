@@ -1,4 +1,4 @@
-defmodule PmetricsWeb.AdminLive.FormComponent do
+defmodule PmetricsWeb.AlquimiaLive.FormComponent do
   use PmetricsWeb, :live_component
 
   alias Pmetrics.Accounts

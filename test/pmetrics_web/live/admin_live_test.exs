@@ -1,4 +1,4 @@
-defmodule PmetricsWeb.AdminLiveTest do
+defmodule PmetricsWeb.AlquimiaLiveTest do
   use PmetricsWeb.ConnCase
 
   import Phoenix.LiveViewTest

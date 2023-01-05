@@ -1,4 +1,4 @@
-defmodule PmetricsWeb.AdminLive.Show do
+defmodule PmetricsWeb.AlquimiaLive.Show do
   use PmetricsWeb, :live_view
 
   alias Pmetrics.Accounts

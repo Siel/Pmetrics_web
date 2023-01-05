@@ -74,12 +74,6 @@ defmodule PmetricsWeb.Router do
       live "/users/log_in", UserLoginLive, :new
       live "/users/reset_password", UserForgotPasswordLive, :new
       live "/users/reset_password/:token", UserResetPasswordLive, :edit
-      live "/users", AdminLive.Index, :index
-      live "/users/new", AdminLive.Index, :new
-      live "/users/:id/edit", AdminLive.Index, :edit
-
-      live "/users/:id", AdminLive.Show, :show
-      live "/users/:id/show/edit", AdminLive.Show, :edit
     end
 
     post "/users/log_in", UserSessionController, :create
@@ -92,6 +86,12 @@ defmodule PmetricsWeb.Router do
       on_mount: [{PmetricsWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+
+      live "/alquimia", AlquimiaLive.Index, :index
+      live "/alquimia/new", AlquimiaLive.Index, :new
+      live "/alquimia/:id/edit", AlquimiaLive.Index, :edit
+      live "/alquimia/:id", AlquimiaLive.Show, :show
+      live "/alquimia/:id/show/edit", AlquimiaLive.Show, :edit
     end
   end
 

@@ -7,6 +7,7 @@ defmodule Pmetrics.Alquimia.Server do
 
   @timeout :timer.hours(1)
   @polling_rate 3000
+  @topic "Alquimia"
 
   # Server API
 
@@ -29,6 +30,7 @@ defmodule Pmetrics.Alquimia.Server do
   # Server Callbacks
   def init({id, model_txt, data_txt}) do
     Logger.info("Spawned a process with id: #{id}")
+    Process.flag(:trap_exit, true)
     {:ok, Analysis.new(model_txt, data_txt, id), @timeout}
   end
 
@@ -45,6 +47,8 @@ defmodule Pmetrics.Alquimia.Server do
       |> Map.put(:status, "running")
 
     Run.update_execution(analysis)
+    PmetricsWeb.Endpoint.broadcast_from(self(),@topic,"update_queue",[])
+
 
     schedule_poll()
     {:noreply, analysis, @timeout}
@@ -64,7 +68,10 @@ defmodule Pmetrics.Alquimia.Server do
           |> Map.put(:out_data, Alquimia.Analysis.get_outdata(analysis))
 
         Run.update_execution(analysis)
-        Process.send_after(Alquimia.pid(), :update_queue, 300)
+        PmetricsWeb.Endpoint.broadcast_from(self(),@topic,"update_queue",[])
+
+        # :ok = GenServer.call(Alquimia.pid(), {:execute_queue_after, 300})
+        # Process.send_after(Alquimia.pid(), :execute_queue, 300)
         {:stop, {:shutdown, :execution_finished}, analysis}
 
       true ->
@@ -87,6 +94,7 @@ defmodule Pmetrics.Alquimia.Server do
   # util
 
   def terminate(_reason, _state) do
+    # Process.send_after(Alquimia.pid(), :execute_queue, 0)
     :ok
   end
 
