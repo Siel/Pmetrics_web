@@ -2,8 +2,8 @@ import Config
 
 # Configure your database
 config :pmetrics, Pmetrics.Repo,
-  username: "dev",
-  password: "",
+  username: "siel",
+  password: "siel",
   hostname: "localhost",
   database: "pmetrics_dev",
   stacktrace: true,
