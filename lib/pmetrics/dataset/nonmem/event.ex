@@ -32,7 +32,7 @@ defmodule Pmetrics.Dataset.Nonmem.Event do
   @doc """
   Validate NONMEM requirements as stated on the NONMEM tutorial
   https://ascpt.onlinelibrary.wiley.com/doi/pdf/10.1002/psp4.12404
-  """
+
   def changeset(event, attrs) do
     event
     |> cast(attrs, [
@@ -77,4 +77,5 @@ defmodule Pmetrics.Dataset.Nonmem.Event do
         add_error(changeset, key, "Error. ${key} must be numerical or '.' ")
     end
   end
+  """
 end
